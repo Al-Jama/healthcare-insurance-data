@@ -1,0 +1,18 @@
+{
+    "storage_account": "yourstorageaccount",
+    "containers": {
+        "landing": "landing",
+        "bronze": "bronze",
+        "silver": "silver",
+        "gold": "gold"
+    },
+    "databricks": {
+        "workspace_url": "https://your-workspace.azuredatabricks.net",
+        "notebook_path_prefix": "/Users/youruser"
+    },
+    "sql_database": {
+        "server": "yourserver.database.windows.net",
+        "database": "yourdb",
+        "username": "youruser"
+    }
+}
