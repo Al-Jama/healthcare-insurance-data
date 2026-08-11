@@ -1,0 +1,51 @@
+{
+    "name": "main_healthcare_pipeline",
+    "properties": {
+        "activities": [
+            {
+                "name": "Copy landing to bronze",
+                "type": "Copy",
+                "dependsOn": [],
+                "policy": { "timeout": "0.12:00:00", "retry": 3 },
+                "typeProperties": {
+                    "source": {
+                        "type": "DelimitedTextSource",
+                        "storeSettings": {
+                            "type": "AzureBlobStorageReadSettings",
+                            "recursive": true,
+                            "wildcardFileName": "*"
+                        }
+                    },
+                    "sink": {
+                        "type": "ParquetSink",
+                        "storeSettings": {
+                            "type": "AzureBlobStorageWriteSettings"
+                        }
+                    },
+                    "enableStaging": false
+                },
+                "inputs": [ { "referenceName": "LandingDataset", "type": "DatasetReference" } ],
+                "outputs": [ { "referenceName": "BronzeDataset", "type": "DatasetReference" } ]
+            },
+            {
+                "name": "Run bronze to silver notebook",
+                "type": "DatabricksNotebook",
+                "dependsOn": [ { "activity": "Copy landing to bronze", "dependencyConditions": ["Succeeded"] } ],
+                "typeProperties": {
+                    "notebookPath": "/Users/youruser/01_bronze_to_silver"
+                },
+                "linkedServiceName": { "referenceName": "DatabricksLinkedService", "type": "LinkedServiceReference" }
+            },
+            {
+                "name": "Run silver to gold notebook",
+                "type": "DatabricksNotebook",
+                "dependsOn": [ { "activity": "Run bronze to silver notebook", "dependencyConditions": ["Succeeded"] } ],
+                "typeProperties": {
+                    "notebookPath": "/Users/youruser/02_silver_to_gold"
+                },
+                "linkedServiceName": { "referenceName": "DatabricksLinkedService", "type": "LinkedServiceReference" }
+            }
+        ],
+        "annotations": []
+    }
+}
